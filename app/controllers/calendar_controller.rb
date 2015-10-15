@@ -36,7 +36,7 @@ class CalendarController < ApplicationController
 
 	session[:access_token] = response['access_token']
 
-	redirect_to url_for(:action => :calendars)
+	redirect_to 'https://glacial-plains-7554.herokuapp.com/calendars'#url_for(:action => :calendars)
   end
 
   def calendars

@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   root 'welcome#index'
   get 'auth' => 'calendar#redirect'
   get 'callback' => 'calendar#callback'
+  get 'calendars' => 'calendar#calendars'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
