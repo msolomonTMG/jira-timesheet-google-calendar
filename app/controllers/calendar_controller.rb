@@ -53,9 +53,15 @@ class CalendarController < ApplicationController
 
 	google_calendar_api = google_api_client.discovered_api('calendar', 'v3')
 
+	# response = google_api_client.execute({
+	#   api_method: google_calendar_api.calendar_list.list,
+	#   parameters: {}
+	# })
 	response = google_api_client.execute({
-	  api_method: google_calendar_api.calendar_list.list,
-	  parameters: {}
+	  api_method: google_calendar_api.events.list,
+	  parameters: {
+	  	'calendarId' => 'primary'
+	  }
 	})
 
 	@items = response.data['items']
