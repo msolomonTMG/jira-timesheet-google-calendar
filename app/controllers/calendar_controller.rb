@@ -10,7 +10,7 @@ class CalendarController < ApplicationController
 	  client_secret: ENV['GOOGLE_API_CLIENT_SECRET'],
 	  authorization_uri: 'https://accounts.google.com/o/oauth2/auth',
 	  scope: 'https://www.googleapis.com/auth/calendar.readonly',
-	  redirect_uri: url_for(:action => :callback)
+	  redirect_uri: 'https://glacial-plains-7554.herokuapp.com/callback'#url_for(:action => :callback)
 	})
 
 	authorization_uri = google_api_client.authorization.authorization_uri
@@ -28,7 +28,7 @@ class CalendarController < ApplicationController
 	  client_id: ENV['GOOGLE_API_CLIENT_ID'],
 	  client_secret: ENV['GOOGLE_API_CLIENT_SECRET'],
 	  token_credential_uri: 'https://accounts.google.com/o/oauth2/token',
-	  redirect_uri: url_for(:action => :callback),
+	  redirect_uri: 'https://glacial-plains-7554.herokuapp.com/callback' #url_for(:action => :callback),
 	  code: params[:code]
 	})
 
