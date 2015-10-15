@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   rescue_from JIRA::OauthClient::UninitializedAccessTokenError do
-    redirect_to new_jira_session_url
+    redirect_to 'https://glacial-plains-7554.herokuapp.com/jira-auth'
   end
 
   private
