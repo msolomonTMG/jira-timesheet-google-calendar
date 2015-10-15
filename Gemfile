@@ -38,3 +38,5 @@ gem 'puma'
 # Use debugger
 # gem 'debugger', group: [:development, :test]
 
+gem 'google-api-client', '~> 0.7.0', require: 'google/api_client'
+
