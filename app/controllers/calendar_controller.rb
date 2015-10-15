@@ -53,10 +53,6 @@ class CalendarController < ApplicationController
 
 	google_calendar_api = google_api_client.discovered_api('calendar', 'v3')
 
-	# response = google_api_client.execute({
-	#   api_method: google_calendar_api.calendar_list.list,
-	#   parameters: {}
-	# })
 	date = Date.today
 	timezone = ActiveSupport::TimeZone['America/New_York']
 
@@ -74,7 +70,6 @@ class CalendarController < ApplicationController
 
 	meetings.each do |meeting|
 		if meeting['status'] === "confirmed"
-			
 			meeting['time_elapsed'] = meeting['end']['dateTime'] - meeting['start']['dateTime']
 			meeting['time_elapsed_seconds'] = meeting['time_elapsed'] * 1.days
 			@meetings_attended.push(meeting)
