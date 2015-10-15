@@ -14,7 +14,7 @@ class ApplicationController < ActionController::Base
     # add any extra configuration options for your instance of JIRA,
     # e.g. :use_ssl, :ssl_verify_mode, :context_path, :site
     options = {
-      :private_key_file => "rsakey.pem",
+      :private_key_file => "server.key",
       :consumer_key => 'test'
     }
 
