@@ -57,10 +57,15 @@ class CalendarController < ApplicationController
 	#   api_method: google_calendar_api.calendar_list.list,
 	#   parameters: {}
 	# })
+	date = Date.today
+	timezone = ActiveSupport::TimeZone['America/New_York']
+
 	response = google_api_client.execute({
 	  api_method: google_calendar_api.events.list,
 	  parameters: {
-	  	'calendarId' => 'primary'
+	  	'calendarId' => 'primary',
+	  	'timeMin' => '2015-10-14T10:00:00Z',#timezone.local(date.year, date.month, date.day),
+	  	'timeMax' => '2011-10-15T10:00:00Z'#Time.now.to_datetime.rfc3339
 	  }
 	})
 
