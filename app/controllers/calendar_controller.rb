@@ -6,8 +6,8 @@ class CalendarController < ApplicationController
 	})
 
 	google_api_client.authorization = Signet::OAuth2::Client.new({
-	  client_id: ENV.fetch('GOOGLE_API_CLIENT_ID'),
-	  client_secret: ENV.fetch('GOOGLE_API_CLIENT_SECRET'),
+	  client_id: ENV['GOOGLE_API_CLIENT_ID'],
+	  client_secret: ENV['GOOGLE_API_CLIENT_SECRET'],
 	  authorization_uri: 'https://accounts.google.com/o/oauth2/auth',
 	  scope: 'https://www.googleapis.com/auth/calendar.readonly',
 	  redirect_uri: url_for(:action => :callback)
@@ -25,8 +25,8 @@ class CalendarController < ApplicationController
 	})
 
 	google_api_client.authorization = Signet::OAuth2::Client.new({
-	  client_id: ENV.fetch('GOOGLE_API_CLIENT_ID'),
-	  client_secret: ENV.fetch('GOOGLE_API_CLIENT_SECRET'),
+	  client_id: ENV['GOOGLE_API_CLIENT_ID'],
+	  client_secret: ENV['GOOGLE_API_CLIENT_SECRET'],
 	  token_credential_uri: 'https://accounts.google.com/o/oauth2/token',
 	  redirect_uri: url_for(:action => :callback),
 	  code: params[:code]
@@ -46,8 +46,8 @@ class CalendarController < ApplicationController
 	})
 
 	google_api_client.authorization = Signet::OAuth2::Client.new({
-	  client_id: ENV.fetch('GOOGLE_API_CLIENT_ID'),
-	  client_secret: ENV.fetch('GOOGLE_API_CLIENT_SECRET'),
+	  client_id: ENV['GOOGLE_API_CLIENT_ID'],
+	  client_secret: ENV['GOOGLE_API_CLIENT_SECRET'],
 	  access_token: session[:access_token]
 	})
 
