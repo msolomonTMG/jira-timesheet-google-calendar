@@ -1,5 +1,5 @@
 <ul>
 <% @items.each do |item| %>
-  <li><%= item['summary'] %></li>
+  <li><%= item.to_json %></li>
 <% end %>
 </ul>

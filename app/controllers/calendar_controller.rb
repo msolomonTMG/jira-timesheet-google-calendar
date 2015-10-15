@@ -64,8 +64,8 @@ class CalendarController < ApplicationController
 	  api_method: google_calendar_api.events.list,
 	  parameters: {
 	  	'calendarId' => 'primary',
-	  	'timeMin' => timezone.local(date.year, date.month, date.day),
-	  	'timeMax' => Time.now.to_datetime.rfc3339
+	  	'timeMin' => '2015-10-14T10:00:00Z',#timezone.local(date.year, date.month, date.day),
+	  	'timeMax' => '2015-10-15T10:00:00Z'#Time.now.to_datetime.rfc3339
 	  }
 	})
 
