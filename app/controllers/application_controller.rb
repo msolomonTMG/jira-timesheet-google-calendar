@@ -15,7 +15,9 @@ class ApplicationController < ActionController::Base
     # e.g. :use_ssl, :ssl_verify_mode, :context_path, :site
     options = {
       :private_key_file => "server.key",
-      :consumer_key => 'test'
+      :consumer_key => ENV['CONSUMER_KEY'],
+      :use_ssl => true,
+
     }
 
     @jira_client = JIRA::Client.new(options)
