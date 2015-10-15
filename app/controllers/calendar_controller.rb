@@ -65,7 +65,7 @@ class CalendarController < ApplicationController
 	  parameters: {
 	  	'calendarId' => 'primary',
 	  	'timeMin' => '2015-10-14T10:00:00Z',#timezone.local(date.year, date.month, date.day),
-	  	'timeMax' => '2011-10-15T10:00:00Z'#Time.now.to_datetime.rfc3339
+	  	'timeMax' => '2015-10-15T10:00:00Z'#Time.now.to_datetime.rfc3339
 	  }
 	})
 
