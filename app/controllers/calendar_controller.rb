@@ -69,6 +69,13 @@ class CalendarController < ApplicationController
 	  }
 	})
 
-	@items = response.data['items']
+	meetings = response.data['items']
+	@meetings_attended = Array.new
+
+	meetings.each do |meeting|
+		if meeting['status'] === "confirmed"
+			@meetings_attended.push(meeting)
+		end
+	end
   end
 end
