@@ -2,7 +2,7 @@ class JiraSessionsController < ApplicationController
   before_filter :get_jira_client
 
   def new
-    callback_url = 'http://callback'
+    callback_url = 'https://glacial-plains-7554.herokuapp.com/jira-callback'
     request_token = @jira_client.request_token(oauth_callback: callback_url)
     session[:request_token] = request_token.token
     session[:request_secret] = request_token.secret
