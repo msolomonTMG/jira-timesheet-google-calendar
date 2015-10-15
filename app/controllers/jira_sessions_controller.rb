@@ -26,7 +26,7 @@ class JiraSessionsController < ApplicationController
     session.delete(:request_token)
     session.delete(:request_secret)
 
-    redirect_to projects_path
+    redirect_to 'https://glacial-plains-7554.herokuapp.com/issues'
   end
 
   def destroy
