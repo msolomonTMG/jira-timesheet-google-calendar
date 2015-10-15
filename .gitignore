@@ -17,3 +17,10 @@
 
 # Ignore ruby-version
 /.ruby-version
+
+# Ignore certs
+server.crt
+server.csr
+server.key
+server.pass.key
+rsa.pem
