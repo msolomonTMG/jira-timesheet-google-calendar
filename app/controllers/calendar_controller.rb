@@ -71,7 +71,8 @@ class CalendarController < ApplicationController
 	meetings.each do |meeting|
 		if meeting['status'] === "confirmed"
 			meeting['time_elapsed'] = meeting['end']['dateTime'] - meeting['start']['dateTime']
-			meeting['time_elapsed_seconds'] = meeting['time_elapsed'] * 1.days
+			# Convert the seconds of time spent into hours and minutes
+  			meeting['time_elapsed_formatted'] = Time.at(meeting['time_elapsed']).utc.strftime("%Hh %Mm")
 			@meetings_attended.push(meeting)
 		end
 	end
