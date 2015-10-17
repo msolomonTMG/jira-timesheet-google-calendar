@@ -13,6 +13,8 @@ class CalendarController < ApplicationController
 	  redirect_uri: 'https://glacial-plains-7554.herokuapp.com/callback',#url_for(:action => :callback)
 	})
 
+	puts google_api_client.authorization.inspect
+
 	authorization_uri = google_api_client.authorization.authorization_uri
 
 	redirect_to authorization_uri.to_s
@@ -61,7 +63,7 @@ class CalendarController < ApplicationController
 	  parameters: {
 	  	'calendarId' => 'primary',
 	  	'timeMin' => '2015-10-14T10:00:00Z',#timezone.local(date.year, date.month, date.day),
-	  	'timeMax' => '2015-10-15T10:00:00Z'#Time.now.to_datetime.rfc3339
+	  	'timeMax' => Time.now.to_datetime.rfc3339#'2015-10-15T10:00:00Z'
 	  }
 	})
 

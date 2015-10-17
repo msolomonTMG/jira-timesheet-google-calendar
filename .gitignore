@@ -23,3 +23,6 @@
 *.csr
 *.key
 *.pem
+
+# Ignore local configurations
+config/heroku_env.rb
