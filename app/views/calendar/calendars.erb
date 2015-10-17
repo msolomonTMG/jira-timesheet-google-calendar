@@ -1,5 +1,9 @@
 <ul>
 <% @meetings_attended.each do |meeting| %>
-  <li><%= meeting.to_json %></li>
+  <ul>
+  	<!--<li><%= meeting.to_json %></li>-->
+  	<li><%= meeting['summary'] %></li>
+  	<li><%= meeting['time_elapsed_formatted'] %></li>
+  </ul>
 <% end %>
 </ul>
