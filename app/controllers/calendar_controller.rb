@@ -10,7 +10,7 @@ class CalendarController < ApplicationController
 	  client_secret: ENV['GOOGLE_API_CLIENT_SECRET'],
 	  authorization_uri: 'https://accounts.google.com/o/oauth2/auth',
 	  scope: 'https://www.googleapis.com/auth/calendar.readonly',
-	  redirect_uri: 'https://glacial-plains-7554.herokuapp.com/callback',#url_for(:action => :callback)
+	  redirect_uri: 'http://localhost:5000/callback'#'https://glacial-plains-7554.herokuapp.com/callback',#url_for(:action => :callback)
 	})
 
 	puts google_api_client.authorization.inspect
@@ -30,7 +30,7 @@ class CalendarController < ApplicationController
 	  client_id: ENV['GOOGLE_API_CLIENT_ID'],
 	  client_secret: ENV['GOOGLE_API_CLIENT_SECRET'],
 	  token_credential_uri: 'https://accounts.google.com/o/oauth2/token',
-	  redirect_uri: 'https://glacial-plains-7554.herokuapp.com/callback',#url_for(:action => :callback),
+	  redirect_uri: 'http://localhost:5000/callback',#'https://glacial-plains-7554.herokuapp.com/callback',#url_for(:action => :callback),
 	  code: params[:code]
 	})
 
@@ -38,7 +38,7 @@ class CalendarController < ApplicationController
 
 	session[:access_token] = response['access_token']
 
-	redirect_to 'https://glacial-plains-7554.herokuapp.com/calendars'#url_for(:action => :calendars)
+	redirect_to :action => "calendars"#'https://glacial-plains-7554.herokuapp.com/calendars'#url_for(:action => :calendars)
   end
 
   def calendars
