@@ -32,4 +32,31 @@ class JiraSessionsController < ApplicationController
   def destroy
     session.data.delete(:jira_auth)
   end
+
+  def log_time
+    @meetings = Array.new
+    @responses = Array.new
+
+    params.each do |meeting|
+      if meeting[0].is_number? && meeting[1]['check'] === "on"
+        @meetings.push(meeting)
+      end
+    end
+
+    @meetings.each do |meeting|
+      url = "#{ENV['JIRA_URL']}/rest/api/2/issue/THR-1121/worklog"
+      data = {
+        :timeSpent => meeting[1]['time'],
+        :comment  => meeting[1]['summary']
+      }.to_json
+      headers = {
+       :Authorization => 'Basic bXNvbG9tb246IVluZnRwbzEy',
+       :content_type  => 'application/json'
+      }
+      response = RestClient.post url, data, headers
+      @responses.push(response)
+    end
+
+  end
+
 end

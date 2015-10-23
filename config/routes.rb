@@ -15,6 +15,8 @@ Rails.application.routes.draw do
   get 'calendars' => 'calendar#calendars'
   get 'issues' => 'issues#index'
 
+  post 'log_time' => 'jira_sessions#log_time'
+
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 

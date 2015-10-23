@@ -1,9 +1,27 @@
-<ul>
-<% @meetings_attended.each do |meeting| %>
-  <ul>
-  	<!--<li><%= meeting.to_json %></li>-->
-  	<li><%= meeting['summary'] %></li>
-  	<li><%= meeting['time_elapsed_formatted'] %></li>
-  </ul>
-<% end %>
-</ul>
+<div class="container">
+	<div class="row">
+		<div class="col-md-6">
+      		<%= form_tag({controller: "jira_sessions", action: "log_time"}, method: "post", name: "meetings") do %>
+      		<table class="table table-striped">
+        		<th>Meeting</th>
+        		<th>Time</th>
+        		<th>Log Time</th>
+        		
+				<% @meetings_attended.each_with_index do |meeting, index| %>
+					<div class="form-group">
+					<tr>
+						<td><input name="<%= index %>[summary]" type="text" value="<%= meeting['summary'] %>" /></td>
+						<td><input name="<%= index %>[time]" type="text" value="<%= meeting['time_elapsed_formatted'] %>" class="time" /></td>
+						<td><input name="<%= index %>[check]" type="checkbox" <% if meeting['is_accepted'] %> checked <%end%> ></td>
+					</tr>
+					</div>
+				<% end %>
+
+			</table>
+				<button class="btn btn-success pull-right" type="submit">Submit</button>
+	  		<% end %>
+		</div>
+	</div>
+	<hr>
+	<%= @meetings_attended.to_json %>
+</div>

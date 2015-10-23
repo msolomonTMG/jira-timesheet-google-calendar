@@ -18,6 +18,20 @@
     <div class="col-md-6">
       <h3><span class="glyphicon glyphicon-info-sign"></span> How this sample app works</h3>
       <ul>
+        <%= form_tag("/calendars", method: "get") do %>
+          <%= label_tag(:start_time, "Start Time:") %>
+          <%= text_field_tag(:start_time, @today_9am) %>
+          <%= label_tag(:end_time, "Start Time:") %>
+          <%= text_field_tag(:end_time, Time.now.to_datetime.rfc3339) %>
+          <%= submit_tag("Get Results") %>
+        <% end %>
+      </ul>
+    </div>
+  </div> <!-- row -->
+  <div class="row">
+    <div class="col-md-6">
+      <h3><span class="glyphicon glyphicon-info-sign"></span> How this sample app works</h3>
+      <ul>
         <li>This app was deployed to Heroku, either using Git or by using <a href="https://github.com/heroku/ruby-getting-started">Heroku Button</a> on the repository.</li>
 
         <li>When Heroku received the source code, it grabbed all the dependencies in the <a href="https://github.com/heroku/ruby-getting-started/blob/master/Gemfile">Gemfile</a>.</li>

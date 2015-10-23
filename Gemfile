@@ -40,4 +40,6 @@ gem 'puma'
 
 gem 'google-api-client', '~> 0.7.0', require: 'google/api_client'
 gem 'jira-ruby', :require => 'jira'
+gem 'font-awesome-rails'
+gem 'rest-client'
 

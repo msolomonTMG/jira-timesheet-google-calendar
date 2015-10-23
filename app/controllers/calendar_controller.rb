@@ -13,8 +13,6 @@ class CalendarController < ApplicationController
 	  redirect_uri: 'http://localhost:5000/callback'#'https://glacial-plains-7554.herokuapp.com/callback',#url_for(:action => :callback)
 	})
 
-	puts google_api_client.authorization.inspect
-
 	authorization_uri = google_api_client.authorization.authorization_uri
 
 	redirect_to authorization_uri.to_s
@@ -41,6 +39,18 @@ class CalendarController < ApplicationController
 	redirect_to :action => "calendars"#'https://glacial-plains-7554.herokuapp.com/calendars'#url_for(:action => :calendars)
   end
 
+  def is_attending? (meeting)
+  	meeting['attendees'].each do |attendee|
+  		if attendee['self'] === true 
+  			if attendee['responseStatus'] == "accepted"
+  				return true
+  			else
+  				return false
+  			end
+  		end
+  	end
+  end
+
   def calendars
 	google_api_client = Google::APIClient.new({
 	  application_name: 'JIRA Timesheet Google Calendar',
@@ -55,15 +65,26 @@ class CalendarController < ApplicationController
 
 	google_calendar_api = google_api_client.discovered_api('calendar', 'v3')
 
-	date = Date.today
-	timezone = ActiveSupport::TimeZone['America/New_York']
+	if params[:start_time] === ""
+		today_8am = Time.new Time.now.year, Time.now.month, Time.now.day, 8, 0, 0
+		start_time = today_8am.to_datetime.rfc3339
+	else
+		start_time = params[:start_time]
+	end
+
+	if params[:end_time] === ""
+		today_8pm = Time.new Time.now.year, Time.now.month, Time.now.day, 20, 0, 0
+		end_time = today_8pm.to_datetime.rfc3339
+	else
+		end_time = params[:end_time]
+	end
 
 	response = google_api_client.execute({
 	  api_method: google_calendar_api.events.list,
 	  parameters: {
 	  	'calendarId' => 'primary',
-	  	'timeMin' => '2015-10-14T10:00:00Z',#timezone.local(date.year, date.month, date.day),
-	  	'timeMax' => Time.now.to_datetime.rfc3339#'2015-10-15T10:00:00Z'
+	  	'timeMin' => start_time,#'2015-10-14T10:00:00Z',#timezone.local(date.year, date.month, date.day),
+	  	'timeMax' => end_time#Time.now.to_datetime.rfc3339#'2015-10-15T10:00:00Z'
 	  }
 	})
 
@@ -72,9 +93,11 @@ class CalendarController < ApplicationController
 
 	meetings.each do |meeting|
 		if meeting['status'] === "confirmed"
+			meeting['is_accepted'] = is_attending? meeting
 			meeting['time_elapsed'] = meeting['end']['dateTime'] - meeting['start']['dateTime']
 			# Convert the seconds of time spent into hours and minutes
   			meeting['time_elapsed_formatted'] = Time.at(meeting['time_elapsed']).utc.strftime("%Hh %Mm")
+  			
 			@meetings_attended.push(meeting)
 		end
 	end
