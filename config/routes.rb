@@ -17,6 +17,8 @@ Rails.application.routes.draw do
 
   post 'log_time' => 'jira_sessions#log_time'
 
+  get 'query' => 'issues#query'
+
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 

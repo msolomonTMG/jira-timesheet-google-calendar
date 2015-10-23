@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   rescue_from JIRA::OauthClient::UninitializedAccessTokenError do
-    redirect_to 'https://glacial-plains-7554.herokuapp.com/jira-auth'
+    redirect_to '/jira-auth'
   end
 
   private
@@ -14,8 +14,10 @@ class ApplicationController < ActionController::Base
     # add any extra configuration options for your instance of JIRA,
     # e.g. :use_ssl, :ssl_verify_mode, :context_path, :site
     options = {
-      :private_key_file => "rsa.pem",
-      :consumer_key => ENV['CONSUMER_KEY']
+      :private_key_file => "rsakey.pem",
+      :consumer_key => "06cc84ab493497e8bf4682c821eacd3b",
+      :site => "https://thrillistmediagroup.atlassian.net",
+      :context_path => ""
     }
 
     @jira_client = JIRA::Client.new(options)
