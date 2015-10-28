@@ -10,12 +10,11 @@ class ApplicationController < ActionController::Base
   private
 
   def get_jira_client
-
     # add any extra configuration options for your instance of JIRA,
     # e.g. :use_ssl, :ssl_verify_mode, :context_path, :site
     options = {
       :private_key_file => "rsakey.pem",
-      :consumer_key => "06cc84ab493497e8bf4682c821eacd3b",
+      :consumer_key => ENV['JIRA_CONSUMER_KEY'],
       :site => "https://thrillistmediagroup.atlassian.net",
       :context_path => ""
     }
@@ -30,4 +29,24 @@ class ApplicationController < ActionController::Base
       )
     end
   end
+
+  def get_google_api
+    google_api_client = Google::APIClient.new({
+      application_name: 'JIRA Timesheet Google Calendar',
+      application_version: '1.0.0'
+    })
+
+    google_api_client.authorization = Signet::OAuth2::Client.new({
+      client_id: ENV['GOOGLE_API_CLIENT_ID'],
+      client_secret: ENV['GOOGLE_API_CLIENT_SECRET'],
+      authorization_uri: 'https://accounts.google.com/o/oauth2/auth',
+      scope: 'https://www.googleapis.com/auth/calendar.readonly',
+      redirect_uri: 'http://localhost:5000/callback'#'https://glacial-plains-7554.herokuapp.com/callback',#url_for(:action => :callback)
+    })
+
+    authorization_uri = google_api_client.authorization.authorization_uri
+
+    redirect_to authorization_uri.to_s
+  end
+
 end

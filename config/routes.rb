@@ -15,9 +15,13 @@ Rails.application.routes.draw do
   get 'calendars' => 'calendar#calendars'
   get 'issues' => 'issues#index'
 
-  post 'log_time' => 'jira_sessions#log_time'
+  post 'log_time' => 'jira_sessions#log_meeting_time'
 
-  get 'query' => 'issues#query'
+  get 'query' => 'jira_sessions#query'
+
+  get 'timesheets' => 'jira_sessions#show_timesheets'
+  post 'timesheets' => 'jira_sessions#show_timesheets'
+  get 'find' => 'jira_sessions#find_issues' #we can remove this view and route soon
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

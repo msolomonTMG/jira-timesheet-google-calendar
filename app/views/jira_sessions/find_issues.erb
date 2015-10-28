@@ -1,0 +1,19 @@
+<div class="container">
+	<h1><%= @issues.length %></h1>
+	<h1><%= session[:jira_auth] %></h1>
+	<table class="table">
+		<th>Key</th>
+		<th>Summary</th>
+		<th>Time Spent</th>
+		<th>Remaining Estimate</th>
+		<th>Log Time</th>
+		<%= @issues.each do |issue| %>
+		<tr>
+			<td><a href="<%= ENV['JIRA_URL'] %>/browse/<%= issue['key'] %>"><%= issue['key'] %></a></td>
+			<td><%= issue['fields']['summary'] %></td>
+			<td><%= issue['fields']['timespent'] %></td>
+			<td><%= issue['fields']['timeestimate'] %></td>
+			<td><input type="text"></td>
+		<% end %>
+	</table>
+</div>

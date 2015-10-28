@@ -1,4 +1,5 @@
 class CalendarController < ApplicationController
+  #before_filter :get_google_api
   def redirect
 	google_api_client = Google::APIClient.new({
 	  application_name: 'JIRA Timesheet Google Calendar',

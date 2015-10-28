@@ -1,0 +1,44 @@
+<div class="container">
+	<div class="row">
+		<div class="col-sm-6 col-sm-offset-3">
+			<%= @view %>
+		</div>
+		<div class="col-sm-3 pull-right">
+			<ul class="list-inline">
+				<li>
+					<%= form_tag({controller: "jira_sessions", action: "show_timesheets"}, method: "post", name: "view") do %>
+						<input name="view" type="hidden" value="month" />
+						<input class="btn btn-primary btn-sm" type="submit" value="Month">
+					<% end %>
+				</li>
+				<li>
+					<%= form_tag({controller: "jira_sessions", action: "show_timesheets"}, method: "post", name: "view") do %>
+						<input name="view" type="hidden" value="week" />
+						<input class="btn btn-primary btn-sm" type="submit" value="Week">
+					<% end %>
+				</li>
+				<li>
+					<%= form_tag({controller: "jira_sessions", action: "show_timesheets"}, method: "post", name: "view") do %>
+						<input name="view" type="hidden" value="day" />
+						<input class="btn btn-primary btn-sm" type="submit" value="Day">
+					<% end %>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<table class="table datatable">
+		<th>Key</th>
+		<th>Summary</th>
+		<th>Time Logged by You</th>
+		<th>Total Remaining Estimate</th>
+		<th>Log Time</th>
+		<%= @issues.each do |issue| %>
+		<tr>
+			<td><a href="<%= ENV['JIRA_URL'] %>/browse/<%= issue['key'] %>"><%= issue['key'] %></a></td>
+			<td><%= issue['summary'] %></td>
+			<td><%= Time.at(issue['total_time_logged_by_user']).utc.strftime("%Hh %Mm") %></td>
+			<td><%= Time.at(issue['remainingEstimateSeconds']).utc.strftime("%Hh %Mm") %></td>
+			<td><input type="text"></td>
+		<% end %>
+	</table>
+</div>
