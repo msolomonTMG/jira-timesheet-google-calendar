@@ -1,44 +1,89 @@
 <div class="container">
 	<div class="row">
-		<div class="col-sm-6 col-sm-offset-3">
-			<%= @view %>
-		</div>
-		<div class="col-sm-3 pull-right">
-			<ul class="list-inline">
-				<li>
-					<%= form_tag({controller: "jira_sessions", action: "show_timesheets"}, method: "post", name: "view") do %>
-						<input name="view" type="hidden" value="month" />
-						<input class="btn btn-primary btn-sm" type="submit" value="Month">
-					<% end %>
-				</li>
-				<li>
-					<%= form_tag({controller: "jira_sessions", action: "show_timesheets"}, method: "post", name: "view") do %>
-						<input name="view" type="hidden" value="week" />
-						<input class="btn btn-primary btn-sm" type="submit" value="Week">
-					<% end %>
-				</li>
-				<li>
-					<%= form_tag({controller: "jira_sessions", action: "show_timesheets"}, method: "post", name: "view") do %>
-						<input name="view" type="hidden" value="day" />
-						<input class="btn btn-primary btn-sm" type="submit" value="Day">
-					<% end %>
-				</li>
-			</ul>
-		</div>
+		<h1>Timesheets <small><%= @view %> view</h1>
 	</div>
-	<table class="table datatable">
-		<th>Key</th>
-		<th>Summary</th>
-		<th>Time Logged by You</th>
-		<th>Total Remaining Estimate</th>
-		<th>Log Time</th>
-		<%= @issues.each do |issue| %>
-		<tr>
-			<td><a href="<%= ENV['JIRA_URL'] %>/browse/<%= issue['key'] %>"><%= issue['key'] %></a></td>
-			<td><%= issue['summary'] %></td>
-			<td><%= Time.at(issue['total_time_logged_by_user']).utc.strftime("%Hh %Mm") %></td>
-			<td><%= Time.at(issue['remainingEstimateSeconds']).utc.strftime("%Hh %Mm") %></td>
-			<td><input type="text"></td>
+	<div class="hidden">
+		<%= form_tag({controller: "jira_sessions", action: "show_timesheets"}, method: "post", name: "view", id: "month") do %>
+			<input name="view" type="hidden" value="monthly" />
 		<% end %>
+		<%= form_tag({controller: "jira_sessions", action: "show_timesheets"}, method: "post", name: "view", id: "week") do %>
+			<input name="view" type="hidden" value="weekly" />
+		<% end %>
+		<%= form_tag({controller: "jira_sessions", action: "show_timesheets"}, method: "post", name: "view", id: "day") do %>
+			<input name="view" type="hidden" value="daily" />
+		<% end %>
+	</div>
+	<table class="table table-striped datatable">
+		<thead>
+			<tr>
+				<th colspan="2">
+					<div class="btn-group">
+						<button 
+							type="submit" form="month" value="submit"
+							<% if @view == "monthly" %>
+								class="btn btn-primary" 
+							<% else %>
+								class="btn btn-default"
+							<% end %> >
+							Monthly
+						</button>
+						<button 
+							type="submit" form="week" value="submit"
+							<% if @view == "weekly" %>
+								class="btn btn-primary"
+							<% else %>
+								class="btn btn-default"
+							<% end %> >
+							Weekly
+						</button>
+						<button type="submit" form="day" value="submit"
+							<% if @view == "daily" %>
+								class="btn btn-primary"
+							<% else %>
+								class="btn btn-default"
+							<% end %> >
+							Daily
+						</button>
+					</div>
+				</th>
+				<th colspan="1">Total Time Logged: <%= Time.at(@total_time_accross_tickets).utc.strftime("%Hh %Mm") %></th>
+				<th colspan="1"></th>
+				<th colspan="1">
+					<% if @sufficient_time_logged == true %>
+						<span class="text-success"><i class="fa fa-check-circle"></i></span>
+					<% else %>
+						<span class="text-warning"><i class="fa fa-exclamation-triangle"></i></span>
+					<% end %>
+					Time Needed to Log: <%= @goal_time %>h 
+				</th>
+			</tr>
+			<tr>
+				<th>Key</th>
+				<th>Summary</th>
+				<th>Time Logged by You <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="bottom" title="Displays the time logged by you for each ticket during the selected time period"></i></th>
+				<th>Total Remaining Estimate <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="bottom" title="Displays the total remaining time estimated for each ticket"></i></th>
+				<th>Log Time</th>
+			</tr>
+		</thead>
+		<tbody>
+			<% @issues.each do |issue| %>
+			<tr>
+				<td><a href="<%= ENV['JIRA_URL'] %>/browse/<%= issue['key'] %>"><%= issue['key'] %></a></td>
+				<td><%= issue['summary'] %></td>
+				<td><%= Time.at(issue['total_time_logged_by_user']).utc.strftime("%Hh %Mm") %></td>
+				<td><%= Time.at(issue['remainingEstimateSeconds']).utc.strftime("%Hh %Mm") %></td>
+				<td><input type="text"></td>
+			<% end %>
+			</tr>
+		</tbody>
 	</table>
 </div>
+
+<script>
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+    $('.datatable').DataTable({
+    	"paging": false
+    }); 
+});
+</script>

@@ -57,25 +57,32 @@ class JiraSessionsController < ApplicationController
   end
 
   def find_issues
-    #
-    # This shouldnt use a view. It should redirect to show_timesheets and pass the issues that this function finds
-    #
-    if params[:start] != nil
-      start_time = params[:start]
+    if params[:view] != nil
+      @view = params[:view]
+      if params[:view] == "monthly"
+        start_time = get_date_for "start_of_month"
+        end_time = get_date_for "end_of_month"
+        maxResults = 50
+      elsif params[:view] == "weekly"
+        start_time = get_date_for "start_of_week"
+        end_time = get_date_for "end_of_week"
+        maxResults = 20
+      else
+        start_time = get_date_for "start_of_day"
+        end_time = get_date_for "end_of_day"
+        maxResults = 20
+      end
     else
-      start_time = 'startOfWeek()'
-    end
-
-    if params[:end] != nil
-      end_time = params[:end]
-    else
-      end_time = 'endOfWeek()'
+      @view = "weekly"
+      start_time = get_date_for "start_of_week"
+      end_time = get_date_for "end_of_week"
+      maxResults = 20
     end
 
     issues_url = "#{ENV['JIRA_URL']}/rest/api/2/search"
     issues_params = {
       :jql => "assignee = currentUser() or status changed during (#{start_time}, #{end_time}) by currentUser() ORDER BY updated DESC",
-      :maxResults => 20
+      :maxResults => maxResults
     }
     issues_headers = {
      :Authorization => 'Basic bXNvbG9tb246IVluZnRwbzEy',
@@ -85,39 +92,78 @@ class JiraSessionsController < ApplicationController
 
     response = JSON.parse(RestClient.get issues_url, issues_headers)
     @issues = response['issues']
+    @total_time_accross_tickets = 0
+    @goal_time = business_hours_between Date.strptime(start_time), Date.strptime(end_time) 
+    
+    @issues.each do |issue|
+      if issue['fields']['timespent'] == nil
+        issue['fields']['timespent'] = 0
+      end
+      if issue['fields']['timeestimate'] == nil
+        issue['fields']['timeestimate'] = 0
+      end
+      @total_time_accross_tickets += issue['fields']['timespent'] = 0
+    end
+
+    @sufficient_time_logged = get_sufficient_time_logged @goal_time, @total_time_accross_tickets
   end
 
-  def show_timesheets (*options)
+  def get_sufficient_time_logged (goal_time, actual_time)
+    if  actual_time >= goal_time * 60
+      sufficient_time_logged = true
+    else
+      sufficient_time_logged = false
+    end
+    return sufficient_time_logged
+  end
+
+  def business_hours_between (date1, date2)
+    business_days = 0
+    date = date2
+    while date > date1
+     business_days = business_days + 1 unless date.saturday? or date.sunday?
+     date = date - 1.day
+    end
+    business_days += 1
+    business_hours = business_days * 8
+  end
+
+  def get_date_for (option)
+    case option
+    when "start_of_month"
+      date = Date.today.beginning_of_month.strftime('%Y-%m-%d')
+    when "end_of_month"
+      date = Date.today.end_of_month.strftime('%Y-%m-%d')
+    when "start_of_week"
+      date = Date.today.beginning_of_week.strftime('%Y-%m-%d')
+    when "end_of_week"
+      date = Date.today.end_of_week.strftime('%Y-%m-%d')
+    when "start_of_day"
+      date = Date.today.beginning_of_day.strftime('%Y-%m-%d')
+    when "end_of_day"
+      date = Date.today.end_of_day.strftime('%Y-%m-%d')
+    end
+    return date
+  end
+
+  def show_timesheets
     if params[:view] != nil
-      if params[:view] == "month"
-        @view = "month"
-        start_time = Date.today.beginning_of_month.strftime('%Y-%m-%d')
-        end_time = Date.today.end_of_month.strftime('%Y-%m-%d')
-      elsif params[:view] == "week"
-        @view = "week"
-        start_time = Date.today.beginning_of_week.strftime('%Y-%m-%d')
-        end_time = Date.today.end_of_week.strftime('%Y-%m-%d')
+      @view = params[:view]
+      if params[:view] == "monthly"
+        start_time = get_date_for "start_of_month"
+        end_time = get_date_for "end_of_month"
+      elsif params[:view] == "weekly"
+        start_time = get_date_for "start_of_week"
+        end_time = get_date_for "end_of_week"
       else
-        @view = "day"
-        start_time = Date.today.beginning_of_day.strftime('%Y-%m-%d')
-        end_time = Date.today.end_of_day.strftime('%Y-%m-%d')
+        start_time = get_date_for "start_of_day"
+        end_time = get_date_for "end_of_day"
       end
     else
-      @view = "week"
-      start_time = Date.today.beginning_of_week.strftime('%Y-%m-%d')
-      end_time = (Date.today.end_of_week - 2).strftime('%Y-%m-%d')
+      @view = "weekly"
+      start_time = get_date_for "start_of_week"
+      end_time = get_date_for "end_of_week"
     end
-    # if params[:start] != nil
-    #   start_time = params[:start]
-    # else
-    #   start_time = Date.today.beginning_of_week.strftime('%Y-%m-%d')
-    # end
-
-    # if params[:end] != nil
-    #   end_time = params[:end]
-    # else
-    #   end_time = (Date.today.end_of_week - 2).strftime('%Y-%m-%d')
-    # end
 
     url = "#{ENV['JIRA_URL']}/rest/tempo-timesheets/3/worklogs"
     params = {
@@ -133,10 +179,12 @@ class JiraSessionsController < ApplicationController
     @time_sheets = JSON.parse(RestClient.get url, headers)
 
     @issues = Array.new
+    @total_time_accross_tickets = 0
+    @goal_time = business_hours_between Date.strptime(start_time), Date.strptime(end_time)
 
     # We get time_sheets in json from the API but it isn't the format I want
-    # We receive json for each worklog - it is not a summarized amount of work for each ticket
-    # This code below will group worklogs by each ticket
+    # We receive json for each worklog and tickets are a part of worklogs instead of the other way around
+    # This code below will treat tickets uniquely and append the corresponding worklogs to tickets
     @time_sheets.each_with_index do |time_sheet, index|
       is_duplicate_issue = false
 
@@ -147,6 +195,9 @@ class JiraSessionsController < ApplicationController
         new_issue['worklogs'].push(worklog)
         new_issue['total_time_logged_by_user'] = 0
         new_issue['total_time_logged_by_user'] += worklog['timeSpentSeconds']
+
+        @total_time_accross_tickets += new_issue['total_time_logged_by_user']
+
         @issues.push(new_issue)
       else
         @issues.each do |issue|
@@ -155,6 +206,8 @@ class JiraSessionsController < ApplicationController
             is_duplicate_issue = true
             issue['worklogs'].push(worklog)
             issue['total_time_logged_by_user'] += worklog['timeSpentSeconds']
+
+            @total_time_accross_tickets += issue['total_time_logged_by_user']
           end
         end
 
@@ -164,9 +217,18 @@ class JiraSessionsController < ApplicationController
           new_issue['worklogs'].push(worklog)
           new_issue['total_time_logged_by_user'] = 0
           new_issue['total_time_logged_by_user'] += worklog['timeSpentSeconds']
+
+          @total_time_accross_tickets += new_issue['total_time_logged_by_user']
           @issues.push(new_issue)
         end
       end
+    end
+    # End of formatting json for our issues with worklogs
+
+    if @goal_time * 60 >= @total_time_accross_tickets
+      @sufficient_time_logged = true
+    else
+      @sufficient_time_logged = false
     end
 
   end

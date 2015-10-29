@@ -21,7 +21,8 @@ Rails.application.routes.draw do
 
   get 'timesheets' => 'jira_sessions#show_timesheets'
   post 'timesheets' => 'jira_sessions#show_timesheets'
-  get 'find' => 'jira_sessions#find_issues' #we can remove this view and route soon
+  get 'find' => 'jira_sessions#find_issues'
+  post 'find' => 'jira_sessions#find_issues'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
