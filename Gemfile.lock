@@ -198,6 +198,8 @@ DEPENDENCIES
   jira-ruby
   jquery-datatables-rails (~> 3.3.0)
   jquery-rails
+  multi_json
+  oauth
   pg
   puma
   rails (= 4.2.3)

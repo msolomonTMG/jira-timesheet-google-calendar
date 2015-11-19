@@ -1,0 +1,9 @@
+<%= form_tag({controller: "jira_sessions", action: "authorize"}, method: "post", name: "auth", id: "authentication_form") do %>
+	<div class="form-group">
+		<input name="username" type="text" placeholder="username (not email)" />
+	</div>
+	<div class="form-group">
+		<input name="password" type="password" placeholder="password" />
+	</div>
+	<button type="submit">Submit</button>
+<% end %>

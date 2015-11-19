@@ -1,38 +1,86 @@
 class JiraSessionsController < ApplicationController
-  before_filter :get_jira_client
+  #before_filter :get_jira_client
 
   def new
-    callback_url = 'http://localhost:5000/jira-callback'
-    request_token = @jira_client.request_token(oauth_callback: callback_url)
-    session[:request_token] = request_token.token
-    session[:request_secret] = request_token.secret
+    # callback_url = 'http://localhost:5000/jira-callback'
+    # request_token = @jira_client.request_token(oauth_callback: callback_url)
+    # session[:request_token] = request_token.token
+    # session[:request_secret] = request_token.secret
 
-    redirect_to request_token.authorize_url
+    # redirect_to request_token.authorize_url
+############
+    # @consumer ||= OAuth::Consumer.new(
+    #   "#{ENV['JIRA_CONSUMER_KEY']}", 
+    #   OpenSSL::PKey::RSA.new(IO.read("rsakey.pem")),
+    #   {
+    #   :site => "#{ENV['JIRA_URL']}", 
+    #   :signature_method => 'RSA-SHA1',
+    #   :scheme => :header,
+    #   :http_method => :post,
+    #   :request_token_path=> '/plugins/servlet/oauth/request-token', 
+    #   :access_token_path => '/plugins/servlet/oauth/access-token',
+    #   :authorize_path => '/plugins/servlet/oauth/authorize'
+    # })
+
+    # if !session[:jira_auth][:request_token].nil? && !session[:jira_auth][:request_token_secret].nil?
+    #   @request_token = OAuth::RequestToken.new(@consumer, session[:jira_auth][:request_token], session[:jira_auth][:request_token_secret])
+    # end
+
+    # if !session[:jira_auth][:access_token].nil? && !session[:jira_auth][:access_token_secret].nil?
+    #   @access_token = OAuth::AccessToken.new(@consumer, session[:jira_auth][:access_token], session[:jira_auth][:access_token_secret])
+    # end
+    # @user = MultiJson.decode(@access_token.get('/rest/auth/latest/session', {'Accept' => 'application/json'}).body)
   end
 
   def authorize
-    request_token = @jira_client.set_request_token(
-      session[:request_token], session[:request_secret]
-    )
-    access_token = @jira_client.init_access_token(
-      :oauth_verifier => params[:oauth_verifier]
-    )
+    # request_token = @jira_client.set_request_token(
+    #   session[:request_token], session[:request_secret]
+    # )
+    # access_token = @jira_client.init_access_token(
+    #   :oauth_verifier => params[:oauth_verifier]
+    # )
 
-    session[:jira_auth] = {
-      :access_token => access_token.token,
-      :access_key => access_token.secret
+    # session[:jira_auth] = {
+    #   :access_token => access_token.token, 
+    #   :access_key => access_token.secret
+    # }
+
+    # session.delete(:request_token)
+    # session.delete(:request_secret)
+
+    # auth_url = "#{ENV['JIRA_URL']}/rest/auth/1/session"
+    # auth_data = {
+    #   :username => params[:username],
+    #   :password => params[:password]
+    # }.to_json
+    # auth_headers = {
+    #  :content_type  => 'application/json'
+    # }
+    decoded_token = "#{params[:username]}:#{params[:password]}"
+    auth_token = Base64.encode64(decoded_token)
+    session[:jira_token] = auth_token
+    start_time = "startOfDay()"
+    end_time = "endOfDay()"
+
+    auth_url = "#{ENV['JIRA_URL']}/rest/api/2/search"
+    auth_params = {
+      :jql => "assignee = currentUser() or comment ~ currentUser() or description ~ currentUser() or status changed during (#{start_time}, #{end_time}) by currentUser() ORDER BY updated DESC",
+      :maxResults => 20
+    }
+    auth_headers = {
+     :content_type  => 'application/json',
+     :Authorization => "Basic #{session[:jira_token]}",
+     :params => auth_params
     }
 
-    session.delete(:request_token)
-    session.delete(:request_secret)
+    @response = JSON.parse(RestClient.get auth_url, auth_headers)
 
-    #uncomment this and it works but the @jira_client variable does nothing outside of this action
-    # @issue = @jira_client.Issue.find('JQWE-1')
-    # puts @issue.to_json
+    # session[:jira_auth] = {
+    #   :user => params[:user], 
+    #   :access_key => params[:password]
+    # }
 
-
-
-    redirect_to action: 'find_issues'
+    #redirect_to action: 'find_issues'
   end
 
   def destroy
@@ -81,11 +129,11 @@ class JiraSessionsController < ApplicationController
 
     issues_url = "#{ENV['JIRA_URL']}/rest/api/2/search"
     issues_params = {
-      :jql => "assignee = currentUser() or status changed during (#{start_time}, #{end_time}) by currentUser() ORDER BY updated DESC",
+      :jql => "assignee = currentUser() or comment ~ currentUser() or description ~ currentUser() or status changed during (#{start_time}, #{end_time}) by currentUser() ORDER BY updated DESC",
       :maxResults => maxResults
     }
     issues_headers = {
-     :Authorization => 'Basic bXNvbG9tb246IVluZnRwbzEy',
+     :Authorization => "Basic #{session[:jira_token]}",
      :content_type  => 'application/json',
      :params => issues_params
     }
@@ -171,7 +219,8 @@ class JiraSessionsController < ApplicationController
       :dateTo => "#{end_time}"
     }
     headers = {
-     :Authorization => 'Basic bXNvbG9tb246IVluZnRwbzEy',
+     #:Authorization => 'Basic bXNvbG9tb246IVluZnRwbzEy',
+     :Authorization => "Bearer #{session[:access_token]}",
      :content_type  => 'application/json',
      :params => params
     }
@@ -250,7 +299,7 @@ class JiraSessionsController < ApplicationController
         :comment  => meeting[1]['summary']
       }.to_json
       headers = {
-       :Authorization => 'Basic bXNvbG9tb246IVluZnRwbzEy',
+       :Authorization => "Basic #{session[:jira_token]}",
        :content_type  => 'application/json'
       }
       response = RestClient.post url, data, headers

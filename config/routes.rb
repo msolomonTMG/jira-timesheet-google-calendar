@@ -7,10 +7,12 @@ Rails.application.routes.draw do
   # You can have the root of your site routed with "root"
   root 'welcome#index'
   get 'auth' => 'calendar#redirect'
+
   get 'jira-auth' => 'jira_sessions#new'
 
   get 'callback' => 'calendar#callback'
   get 'jira-callback' => 'jira_sessions#authorize'
+  post 'jira-callback' => 'jira_sessions#authorize'
 
   get 'calendars' => 'calendar#calendars'
   get 'issues' => 'issues#index'
@@ -23,6 +25,9 @@ Rails.application.routes.draw do
   post 'timesheets' => 'jira_sessions#show_timesheets'
   get 'find' => 'jira_sessions#find_issues'
   post 'find' => 'jira_sessions#find_issues'
+
+  get 'user' => 'jira_sessions#new'
+  get 'destroy/jira-auth' => 'jira_sessions#destroy'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

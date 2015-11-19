@@ -3,31 +3,38 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
 
-  rescue_from JIRA::OauthClient::UninitializedAccessTokenError do
-    redirect_to '/jira-auth'
-  end
+  # rescue_from JIRA::OauthClient::UninitializedAccessTokenError do
+  #   redirect_to '/jira-auth'
+  # end
 
   private
 
+  # def get_jira_token
+  #   redirect_to controller: "jira_sessions", action: "new"
+  # end
+
   def get_jira_client
+    if !session[:jira_token]
+      redirect_to 'jira-auth'
+    end
     # add any extra configuration options for your instance of JIRA,
     # e.g. :use_ssl, :ssl_verify_mode, :context_path, :site
-    options = {
-      :private_key_file => "rsakey.pem",
-      :consumer_key => ENV['JIRA_CONSUMER_KEY'],
-      :site => "https://thrillistmediagroup.atlassian.net",
-      :context_path => ""
-    }
+    # options = {
+    #   :private_key_file => "rsakey.pem",
+    #   :consumer_key => ENV['JIRA_CONSUMER_KEY'],
+    #   :site => "https://thrillistmediagroup.atlassian.net",
+    #   :context_path => ""
+    # }
 
-    @jira_client = JIRA::Client.new(options)
+    # @jira_client = JIRA::Client.new(options)
 
-    # Add AccessToken if authorised previously.
-    if session[:jira_auth]
-      @jira_client.set_access_token(
-        session[:jira_auth][:access_token],
-        session[:jira_auth][:access_key]
-      )
-    end
+    # # Add AccessToken if authorised previously.
+    # if session[:jira_auth]
+    #   @jira_client.set_access_token(
+    #     session[:jira_auth][:access_token],
+    #     session[:jira_auth][:access_key]
+    #   )
+    # end
   end
 
   def get_google_api

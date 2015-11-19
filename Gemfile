@@ -43,4 +43,6 @@ gem 'jira-ruby', :require => 'jira'
 gem 'font-awesome-rails'
 gem 'rest-client'
 gem 'jquery-datatables-rails', '~> 3.3.0'
+gem 'oauth'
+gem 'multi_json'
 
